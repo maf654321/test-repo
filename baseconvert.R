@@ -74,7 +74,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         
         # Replace x
         x <- y; rm(y)
-        if (!identical(x, x[1]) {
+        if (!identical(x, x[1])) {
                 x <- x[1]
                 warning("only first element of vector used")
         }
