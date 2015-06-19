@@ -3,51 +3,114 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         ## ./Other/division_quotient_divisor_dividend1.gif
         # http://www.kwiznet.com/images/questions/grade3/division_quotient_divisor_dividend1.gif
         
-	# Disable scientific notation
-	options(scipen=999)
-	
-        # Prime arguments
+        # Disable scientific notation
+        options(scipen=999)
+        
+        # Format base & interpret character bases to numbers
         base <- base.output
-        if (any(base > 36)) {
-                stop("Base > 36 not supported")
+        object_list_old <- objects()
+        object_list <- c(); y <- x; x <- c()
+        if (is.character(base) | is.character(base.input)) {
+                for (i in seq_along(object_list_old)) {
+                        if (identical(class(get(object_list_old[i])), "character")) {
+                                object_list <- c(object_list, object_list_old[i])
+                        }
+                }
+                for (i in seq_along(object_list)) {
+                        if (get(object_list[i]) %in% "binary") {
+                                assign(object_list[i], 2)
+                        } else if (get(object_list[i]) %in% "ternary") {
+                                assign(object_list[i], 3)
+                        } else if (get(object_list[i]) %in% "quaternary") {
+                                assign(object_list[i], 4)
+                        } else if (get(object_list[i]) %in% "quinary") {
+                                assign(object_list[i], 5)
+                        } else if (get(object_list[i]) %in% "senary") {
+                                assign(object_list[i], 6)
+                        } else if (get(object_list[i]) %in% "heximal") {
+                                assign(object_list[i], 6)
+                        } else if (get(object_list[i]) %in% "septenary") {
+                                assign(object_list[i], 7)
+                        } else if (get(object_list[i]) %in% "octal") {
+                                assign(object_list[i], 2)
+                        } else if (get(object_list[i]) %in% "nonary") {
+                                assign(object_list[i], 9)
+                        } else if (get(object_list[i]) %in% "decimal") {
+                                assign(object_list[i], 10)
+                        } else if (get(object_list[i]) %in% "undecimal") {
+                                assign(object_list[i], 11)
+                        } else if (get(object_list[i]) %in% "dozenal") {
+                                assign(object_list[i], 12)
+                        } else if (get(object_list[i]) %in% "duodecimal") {
+                                assign(object_list[i], 12)
+                        } else if (get(object_list[i]) %in% "tridecimal") {
+                                assign(object_list[i], 13)
+                        } else if (get(object_list[i]) %in% "tetradecimal") {
+                                assign(object_list[i], 14)
+                        } else if (get(object_list[i]) %in% "pentadecimal") {
+                                assign(object_list[i], 15)
+                        } else if (get(object_list[i]) %in% "hex") {
+                                assign(object_list[i], 16)
+                        } else if (get(object_list[i]) %in% "hexadecimal") {
+                                assign(object_list[i], 16)
+                        } else if (get(object_list[i]) %in% "vigesimal") {
+                                assign(object_list[i], 20)
+                        } else if (get(object_list[i]) %in% "quatrovigesimal") {
+                                assign(object_list[i], 24)
+                        } else if (get(object_list[i]) %in% "trigesimal") {
+                                assign(object_list[i], 30)
+                        } else if (get(object_list[i]) %in% "hexatridecimal") {
+                                assign(object_list[i], 36)
+                        } else {
+                                assign(object_list[i], suppressWarnings(as.numeric(get(object_list[i]))))
+                                if (anyNA(get(object_list[i]))) {
+                                        stop("base not recognized")
+                                }
+                        }
+                }
+        } else if (any(base > 36)) {
+                stop("base > 36 not supported")
         }
+        
+        # Replace x
+        x <- y; rm(y)
         
         # Convert non-decimal to decimal
         if (!identical(base.input, 10)) {
                 x <- as.character(x)
-		
-		# Split number
+                
+                # Split number
                 if (length(unlist(strsplit(x, "[.]"))) > 1) {
                         x <- unlist(strsplit(x, "[.]"))[1]
                         warning("x rounded to integer")
                 }
                 x <- unlist(strsplit(x, ""))
-		
-		# Convert LETTERS to numbers >= 10
+                
+                # Convert LETTERS to numbers >= 10
                 if (any(x %in% LETTERS)){
                         x[x %in% LETTERS] <- sapply(x[x %in% LETTERS], function (x) {
                                 x <- match(x, LETTERS) + 9
                         })
                 } else {}
                 x <- as.numeric(x)
-		
-		# Validity check 1
+                
+                # Validity check 1
                 if (any(x >= base.input)) {
-			stop("x not a valid number in base.input")
-		}
-		
-		# Convert
-		for (i in seq_along(x)) {
-			x[i] <- x[i] * (base.input ^ (length(x) - i))
+                        stop("x not a valid number in base.input")
                 }
-		
-		# Sum decimal result
+                
+                # Convert
+                for (i in seq_along(x)) {
+                        x[i] <- x[i] * (base.input ^ (length(x) - i))
+                }
+                
+                # Sum decimal result
                 x <- round(sum(round(x)))
-	
-	# Validity check 2
-	} else if (any (unlist(strsplit(x, "")) %in% LETTERS)) {
-		stop("x not a valid number in base.input")
-	}
+        
+        # Validity check 2
+        } else if (any (unlist(strsplit(as.character(x), "")) %in% LETTERS)) {
+                stop("x not a valid number in base.input")
+        }
         
         # Quick return decimal output
         if (identical(base, 10)) {
@@ -57,7 +120,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
                         result <- as.character(x)
                 }
                 return(result)
-        }
+                }
         
         # Check and format correct input
         if (as.numeric(x) != floor(as.numeric(x))) {
@@ -75,9 +138,8 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         
         # Converting to base using quotient and remainder
         while (!identical(div, 0)) {
-                quot <- floor(div/base)
                 rem <- (div/base - floor(div/base))*base
-                div <- quot
+                div <- floor(div/base)
                 num <- c(rem, num)
         }
         
@@ -99,9 +161,9 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
                 result <- paste(num, collapse = "")
         }
         
-	# Re-enable scientific notation
-	options(scipen = 0)
-	
+        # Re-enable scientific notation
+        options(scipen = 0)
+        
         # Return Result
         return(result)
 }
