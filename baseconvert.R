@@ -8,8 +8,10 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         
         # Format base & interpret character bases to numbers
         base <- base.output
-        object_list_old <- objects()
-        object_list <- c(); y <- x; x <- c()
+      # object_list_old <- objects()
+      # y <- x; x <- c()
+        object_list_old <- c("base.input", "base.output")
+        object_list <- c()
         if (is.character(base) | is.character(base.input)) {
                 for (i in seq_along(object_list_old)) {
                         if (identical(class(get(object_list_old[i])), "character")) {
@@ -73,7 +75,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         }
         
         # Replace x
-        x <- y; rm(y)
+      # x <- y; rm(y)
         if (!identical(x, x[1])) {
                 x <- x[1]
                 warning("only first element of vector used")
