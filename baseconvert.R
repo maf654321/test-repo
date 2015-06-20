@@ -6,13 +6,28 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         # Disable scientific notation
         options(scipen=999)
         
-        # Format base & interpret character bases to numbers
-        base <- base.output
-      # object_list_old <- objects()
-      # y <- x; x <- c()
-        object_list_old <- c("base.input", "base.output")
-        object_list <- c()
-        if (is.character(base) | is.character(base.input)) {
+        # Make base list
+        # object_list_old <- objects()                          #pulls local evironment
+        # y <- x; x <- c()                                      #exempts x from check
+        object_list_old <- c("base.input", "base.output")       #explicitly defined
+        
+        # Checking base length
+        if (!identical(base.input, base.input[1]) || !identical(base.output, base.output[1])) {
+                object_list <- c()
+                for (i in seq_along(object_list_old)) {        
+                        if (!identical(get(object_list_old[i])[1], get(object_list_old))) {
+                                object_list <- c(object_list, object_list_old[i])
+                        }
+                }
+                for (i in seq_along(object_list)) {
+                        assign(object_list[i], get(object_list[i])[1])
+                }
+                warning("only first element of vector used for base")
+        }
+        
+        # Interpret character bases to numeric vector
+        if (is.character(base.input) || is.character(base.output)) {
+                object_list <- c()
                 for (i in seq_along(object_list_old)) {
                         if (identical(class(get(object_list_old[i])), "character")) {
                                 object_list <- c(object_list, object_list_old[i])
@@ -34,7 +49,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
                         } else if (get(object_list[i]) %in% "septenary") {
                                 assign(object_list[i], 7)
                         } else if (get(object_list[i]) %in% "octal") {
-                                assign(object_list[i], 2)
+                                assign(object_list[i], 8)
                         } else if (get(object_list[i]) %in% "nonary") {
                                 assign(object_list[i], 9)
                         } else if (get(object_list[i]) %in% "decimal") {
@@ -70,15 +85,32 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
                                 }
                         }
                 }
-        } else if (any(base > 36)) {
-                stop("base > 36 not supported")
         }
         
-        # Replace x
-      # x <- y; rm(y)
+        # Check if base > 36 or base not whole number
+        if (any(round(base.input) > 36 || round(base.output) > 36)) {
+                stop("base > 36 not supported")
+        } else if (any(round(base.input) < 2 || round(base.output) < 2)) {
+                stop("base < 2 not possible")
+        } else if (!identical(base.input, round(base.input)) || !identical(base.output, round(base.output))) {
+                object_list <- c()
+                for (i in seq_along(object_list_old)) {
+                        if (!identical(get(object_list_old[i]), round(get(object_list_old[i])))) {
+                                object_list <- c(object_list, object_list_old[i])
+                        }
+                }
+                for (i in seq_along(object_list)) {
+                        assign(object_list[i], round(get(object_list[i])))
+                }
+                warning("base rounded to integer")
+        }
+        
+        # Replace base, check x length
+        # x <- y; rm(y)                 not necessary when explicily defining object_list_old
+        base <- base.output
         if (!identical(x, x[1])) {
                 x <- x[1]
-                warning("only first element of vector used")
+                warning("only first element of vector used for x")
         }
         
         # Convert non-decimal to decimal
