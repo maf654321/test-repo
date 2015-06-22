@@ -115,7 +115,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
         
         # Convert non-decimal to decimal
         if (!identical(base.input, 10)) {
-                x <- as.character(x)
+                x <- toupper(as.character(x))
                 
                 # Split number
                 if (length(unlist(strsplit(x, "[.]"))) > 1) {
@@ -146,7 +146,7 @@ baseconvert <- function (x, base.output = 2, base.input = 10, int.if.possible = 
                 x <- round(sum(round(x)))
         
         # Validity check 2
-        } else if (any (unlist(strsplit(as.character(x), "")) %in% LETTERS)) {
+        } else if (any (unlist(strsplit(toupper(as.character(x)), "")) %in% LETTERS)) {
                 stop("x not a valid number in base.input")
         }
         
